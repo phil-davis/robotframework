@@ -9,12 +9,6 @@ Documentation in text file
     robot
     txt
 
-Documentation in TSV file
-    tsv
-
-Documentation in HTML file
-    html
-
 *** Keywords ***
 Verify documentation formatting
     [Arguments]    ${format}
