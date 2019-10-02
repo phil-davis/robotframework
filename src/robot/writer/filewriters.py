@@ -37,6 +37,14 @@ class ColumnAligner(ast.NodeVisitor):
     def __init__(self, widths):
         self.widths = widths
 
+    def visit_TestOrKeyword(self, node):
+        self.generic_visit(node)
+        name = node.name.tokens[0].value
+        if len(name) <= self.widths[0]:
+            print("after")
+            print (node.body.items[0].tokens)
+
+
     def visit_Statement(self, statement):
         if statement.type in (Token.TESTCASE_HEADER, Token.NAME):
             return
@@ -50,7 +58,6 @@ class ColumnAligner(ast.NodeVisitor):
 
 
 class Aligner(ast.NodeVisitor):
-    _test_or_keyword_name_width = 18
     _setting_and_variable_name_width = 14
 
     def visit_Section(self, section):
@@ -105,7 +112,7 @@ class Writer(ast.NodeVisitor):
         self.indent_marker = self.separator if not self.pipes else '   | '
         self._section_seen = False
         self._test_or_kw_seen = False
-        self._test_case_section_headers = False
+        self._test_case_section_headers = None
 
     def visit_Statement(self, statement):
         self._write_statement(statement)
@@ -114,7 +121,8 @@ class Writer(ast.NodeVisitor):
         if self._section_seen:
             self.output.write('\n')
         if section.type == Token.TESTCASE_HEADER:
-            self._test_case_section_headers = len(section.header) > 1
+            if len(section.header) > 1:
+                self._test_case_section_headers = [len(t.value) for t in section.header]
         self.generic_visit(section)
         self._section_seen = True
         self._test_or_kw_seen = False
